@@ -118,6 +118,37 @@ suite =
             , test "17. Nieto Izquierdo Izquierdo" <|
                 \_ ->
                     Expect.equal (Just (Node 3 Empty Empty)) (nietoIzquierdoIzquierdo arbolMediano)
+            , test "18. Obtener Subárbol - árbol vacío" <|
+                \_ ->
+                    Expect.equal Nothing (obtenerSubarbol 5 Empty)
+            , test "18. Obtener Subárbol - valor en raíz" <|
+                \_ ->
+                    Expect.equal (Just arbolPequeno) (obtenerSubarbol 3 arbolPequeno)
+            , test "18. Obtener Subárbol - valor en hijo izquierdo" <|
+                \_ ->
+                    Expect.equal (Just (Node 1 Empty Empty)) (obtenerSubarbol 1 arbolPequeno)
+            , test "18. Obtener Subárbol - valor en hijo derecho" <|
+                \_ ->
+                    Expect.equal (Just (Node 5 Empty Empty)) (obtenerSubarbol 5 arbolPequeno)
+            , test "18. Obtener Subárbol - valor no existe" <|
+                \_ ->
+                    Expect.equal Nothing (obtenerSubarbol 10 arbolPequeno)
+            , test "18. Obtener Subárbol - en árbol mediano" <|
+                \_ ->
+                    Expect.equal (Just (Node 5 (Node 3 Empty Empty) (Node 7 Empty Empty)))
+                        (obtenerSubarbol 5 arbolMediano)
+            , test "18. Buscar en Subárbol - encuentra valor en subárbol" <|
+                \_ ->
+                    Expect.equal (Just 3) (buscarEnSubarbol 5 3 arbolMediano)
+            , test "18. Buscar en Subárbol - primer valor no existe" <|
+                \_ ->
+                    Expect.equal Nothing (buscarEnSubarbol 100 3 arbolMediano)
+            , test "18. Buscar en Subárbol - segundo valor no existe en subárbol" <|
+                \_ ->
+                    Expect.equal Nothing (buscarEnSubarbol 5 100 arbolMediano)
+            , test "18. Buscar en Subárbol - árbol vacío" <|
+                \_ ->
+                    Expect.equal Nothing (buscarEnSubarbol 5 3 Empty)
             ]
         , describe "Parte 3: Result para Validaciones"
             [ test "19. Validar No Vacío - árbol vacío" <|

@@ -11,6 +11,7 @@ Temas:
 - Composición monádica con andThen
 -}
 import List exposing (map)
+import List exposing (filter)
 
 
 -- ============================================================================
@@ -627,7 +628,14 @@ mapArbol funcion arbol =
 
 filterArbol : (a -> Bool) -> Tree a -> Tree a
 filterArbol predicado arbol =
-    Empty
+    case arbol of 
+        Empty -> Empty
+
+        Node v izq der -> 
+            if predicado v then
+                Node V (filterArbol predicado izq) (filterArbol predicado der)¨
+            else
+                Empty
 
 
 -- 37. Fold sobre Árbol
