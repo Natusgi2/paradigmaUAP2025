@@ -5,10 +5,12 @@ Este módulo contiene ejercicios para practicar pattern matching y mónadas en E
 usando árboles binarios como estructura de datos principal.
 
 Temas:
-- Pattern Matching con tipos algebraicos
-- Mónada Maybe para operaciones opcionales
-- Mónada Result para manejo de errores
-- Composición monádica con andThen
+
+  - Pattern Matching con tipos algebraicos
+  - Mónada Maybe para operaciones opcionales
+  - Mónada Result para manejo de errores
+  - Composición monádica con andThen
+
 -}
 import List exposing (map)
 import List exposing (filter)
@@ -18,16 +20,16 @@ import List exposing (filter)
 -- DEFINICIÓN DEL ÁRBOL BINARIO
 -- ============================================================================
 
+
 type Tree a
     = Empty
     | Node a (Tree a) (Tree a)
 
 
+
 -- ============================================================================
 -- PARTE 0: CONSTRUCCIÓN DE ÁRBOLES
 -- ============================================================================
-
-
 -- 1. Crear Árboles de Ejemplo
 
 
@@ -51,6 +53,7 @@ arbolMediano =
     Node 10
         (Node 5 (Node 3 Empty Empty) (Node 7 Empty Empty))
         (Node 15 (Node 12 Empty Empty) (Node 20 Empty Empty))
+
 
 
 -- 2. Es Vacío
@@ -79,11 +82,10 @@ esHoja arbol =
             False
 
 
+
 -- ============================================================================
 -- PARTE 1: PATTERN MATCHING CON ÁRBOLES
 -- ============================================================================
-
-
 -- 4. Tamaño del Árbol
 
 
@@ -179,8 +181,6 @@ maximo arbol =
 -- ============================================================================
 -- PARTE 2: INTRODUCCIÓN A MAYBE
 -- ============================================================================
-
-
 -- 11. Buscar Valor
 
 
@@ -329,8 +329,6 @@ buscarEnSubarbol valor1 valor2 arbol =
 -- ============================================================================
 -- PARTE 3: RESULT PARA VALIDACIONES
 -- ============================================================================
-
-
 -- 19. Validar No Vacío
 
 
@@ -495,11 +493,10 @@ validarBST arbol =
         Err "El árbol no es un BST válido"
 
 
+
 -- ============================================================================
 -- PARTE 4: COMBINANDO MAYBE Y RESULT
 -- ============================================================================
-
-
 -- 27. Maybe a Result
 
 
@@ -513,6 +510,7 @@ maybeAResult mensajeError maybe =
             Err mensajeError
 
 
+
 -- 28. Result a Maybe
 
 
@@ -524,6 +522,7 @@ resultAMaybe result =
 
         Err _ ->
             Nothing
+
 
 
 -- 29. Buscar y Validar
@@ -576,8 +575,6 @@ buscarEnDosArboles valor arbol1 arbol2 =
 -- ============================================================================
 -- PARTE 5: DESAFÍOS AVANZADOS
 -- ============================================================================
-
-
 -- 32. Recorrido Inorder
 
 
@@ -638,12 +635,14 @@ filterArbol predicado arbol =
                 Empty
 
 
+
 -- 37. Fold sobre Árbol
 
 
 foldArbol : (a -> b -> b) -> b -> Tree a -> b
 foldArbol funcion acumulador arbol =
     acumulador
+
 
 
 -- 38. Eliminar de BST
@@ -654,12 +653,14 @@ eliminarBST valor arbol =
     Err "El valor no existe en el árbol"
 
 
+
 -- 39. Construir BST desde Lista
 
 
 desdeListaBST : List comparable -> Result String (Tree comparable)
 desdeListaBST lista =
     Err "Valor duplicado"
+
 
 
 -- 40. Verificar Balance
@@ -670,12 +671,14 @@ estaBalanceado arbol =
     False
 
 
+
 -- 41. Balancear BST
 
 
 balancear : Tree comparable -> Tree comparable
 balancear arbol =
     Empty
+
 
 
 -- 42. Camino a un Valor
@@ -691,12 +694,14 @@ encontrarCamino valor arbol =
     Err "El valor no existe en el árbol"
 
 
+
 -- 43. Seguir Camino
 
 
 seguirCamino : List Direccion -> Tree a -> Result String a
 seguirCamino camino arbol =
     Err "Camino inválido"
+
 
 
 -- 44. Ancestro Común Más Cercano
@@ -707,6 +712,7 @@ ancestroComun valor1 valor2 arbol =
     Err "Uno o ambos valores no existen en el árbol"
 
 
+
 -- ============================================================================
 -- PARTE 6: DESAFÍO FINAL - SISTEMA COMPLETO
 -- ============================================================================
@@ -714,9 +720,9 @@ ancestroComun valor1 valor2 arbol =
 
 -- 45. Sistema Completo de BST
 -- (Las funciones individuales ya están definidas arriba)
-
-
 -- Operaciones que retornan Bool
+
+
 esBSTValido : Tree comparable -> Bool
 esBSTValido arbol =
     esBST arbol
@@ -732,7 +738,10 @@ contieneValor valor arbol =
     contiene valor arbol
 
 
+
 -- Operaciones que retornan Maybe
+
+
 buscarMaybe : comparable -> Tree comparable -> Maybe comparable
 buscarMaybe valor arbol =
     buscar valor arbol
@@ -748,7 +757,10 @@ encontrarMaximoMaybe arbol =
     encontrarMaximo arbol
 
 
+
 -- Operaciones que retornan Result
+
+
 insertarResult : comparable -> Tree comparable -> Result String (Tree comparable)
 insertarResult valor arbol =
     insertarBST valor arbol
@@ -769,7 +781,10 @@ obtenerEnPosicion posicion arbol =
     Err "Posición inválida"
 
 
+
 -- Operaciones de transformación
+
+
 map : (a -> b) -> Tree a -> Tree b
 map funcion arbol =
     mapArbol funcion arbol
@@ -785,7 +800,10 @@ fold funcion acumulador arbol =
     foldArbol funcion acumulador arbol
 
 
+
 -- Conversiones
+
+
 aLista : Tree a -> List a
 aLista arbol =
     inorder arbol
