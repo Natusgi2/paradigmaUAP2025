@@ -1,12 +1,8 @@
 module Main exposing (..)
 
-<<<<<<< HEAD
 import Html exposing (Html, text)
 import Html exposing (a)
 import Html.Attributes exposing (list)
-=======
-import Html exposing (Html, a, text)
->>>>>>> 6503c16d93fb26819380dafdb0211797af43c0f8
 
 
 main : Html msg
@@ -37,31 +33,12 @@ multiply : Int -> Int -> Int
 multiply a b =
     if b == 0 then
         0
-<<<<<<< HEAD
     else if b > 0 then
         a + multiply a (b - 1)
     else
         -- manejar negativos: opcional
         -(multiply a (negate b))
    
-=======
-
-    else if b == 1 then
-        a
-
-    else
-        a + multiply a (b - 1)
-
-
-multiply2 : Int -> Int -> Int -> Int
-multiply2 a b acc =
-    if b == 0 then
-        acc
-
-    else
-        multiply2 a (b - 1) (acc + a)
-
->>>>>>> 6503c16d93fb26819380dafdb0211797af43c0f8
 
 
 -- Ejercicio 1: Función Potencia
@@ -71,24 +48,16 @@ power : Int -> Int -> Int
 power a b =
     if b == 0 then
         1
-<<<<<<< HEAD
     else
         a * power a (b - 1)
     -- TODO: Implementar función potencia
     
-=======
-
-    else
-        a * power a (b - 1)
-
->>>>>>> 6503c16d93fb26819380dafdb0211797af43c0f8
 
 
 -- Ejercicio 2: Factorial
 
 
 factorial : Int -> Int
-<<<<<<< HEAD
 factorial n = 
     if n <= 1 && n > -1 then
         1
@@ -97,22 +66,12 @@ factorial n =
 
     -- TODO: Implementar factorial
     
-=======
-factorial n =
-    if n <= 1 then
-        1
-
-    else
-        n * factorial (n - 1)
-
->>>>>>> 6503c16d93fb26819380dafdb0211797af43c0f8
 
 
 -- Ejercicio 3: Fibonacci
 
 
 fibonacciExponential : Int -> Int
-<<<<<<< HEAD
 fibonacciExponential n = 
     if n <= 0 then
     0
@@ -122,27 +81,15 @@ fibonacciExponential n =
     fibonacciExponential(n - 1)+fibonacciExponential(n - 2)
     -- TODO: Implementar fibonacci exponencial
     
-=======
-fibonacciExponential n =
-    if n <= 1 then
-        n
-
-    else
-        fibonacciExponential (n - 1) + fibonacciExponential (n - 2)
->>>>>>> 6503c16d93fb26819380dafdb0211797af43c0f8
 
 
 -- Ejercicio 3: Fibonacci lineal con acumuladores
 fibonacciLinear : Int -> Int
 fibonacciLinear n =
-<<<<<<< HEAD
     if n < 0 then
         0
     else
         fibonacciHelper n 0 1
-=======
-    fibonacciHelper n 0 1
->>>>>>> 6503c16d93fb26819380dafdb0211797af43c0f8
 
 
 -- Función auxiliar con acumuladores
@@ -150,18 +97,8 @@ fibonacciHelper : Int -> Int -> Int -> Int
 fibonacciHelper n acc1 acc2 =
     if n == 0 then
         acc1
-<<<<<<< HEAD
     else
         fibonacciHelper(n - 1) acc2 (acc1 + acc2) -- se llama a fibonacci helper pero ahora dandole a acc 1 el valor viejo de acc 2 y acc2 toma el valor de la suma de acc2 y 1
-=======
-
-    else if n == 1 then
-        acc2
-
-    else
-        fibonacciHelper (n - 1) acc2 (acc1 + acc2)
-
->>>>>>> 6503c16d93fb26819380dafdb0211797af43c0f8
 
 
 -- Ejercicio 4: Triángulo de Pascal
@@ -169,7 +106,6 @@ fibonacciHelper n acc1 acc2 =
 
 pascalTriangle : Int -> Int -> Int
 pascalTriangle x y =
-<<<<<<< HEAD
     if x < 0 || y < 0 then
         0
     else if x == 0 || x == y then -- lo que hace es verificar si se llego a la ultima linea del triangulo de pascal
@@ -178,14 +114,6 @@ pascalTriangle x y =
         pascalTriangle (x - 1) (y - 1) + pascalTriangle x (y - 1) -- devuelve la suma del triangulo de pascal de arriba a la izquierda con el de arriba directo, dando asi a la coordenada de abajo inmediata
     -- TODO: Implementar triángulo de Pascal
     
-=======
-    if x == 0 || x == y then
-        1
-
-    else
-        pascalTriangle (x - 1) (y - 1) + pascalTriangle x (y - 1)
-
->>>>>>> 6503c16d93fb26819380dafdb0211797af43c0f8
 
 
 -- Ejercicio 5: Máximo Común Divisor (MCD)
