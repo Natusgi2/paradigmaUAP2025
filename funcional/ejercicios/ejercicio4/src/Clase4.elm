@@ -89,14 +89,14 @@ esHoja arbol =
 -- 4. Tamaño del Árbol
 
 
-tamaño : Tree a -> Int
-tamaño arbol =
+tamano : Tree a -> Int
+tamano arbol =
     case arbol of
         Empty ->
             0
 
         Node _ left right ->
-            1 + (tamaño left) + (tamaño right)
+            1 + (tamano left) + (tamano right)
 
 
 -- 5. Altura del Árbol
@@ -199,12 +199,16 @@ buscar valor arbol =
 -- 12. Encontrar Mínimo (con Maybe)
 
 
-encontrarMinimo : Tree Int -> Maybe Int
+encontrarMinimo : Tree comparable -> Maybe comparable
 encontrarMinimo arbol =
     case arbol of
-        Empty -> Nothing
-        Node v Empty Empty -> Just v
-        Node v izq der -> 
+        Empty ->
+            Nothing
+
+        Node v Empty Empty ->
+            Just v
+
+        Node v izq der ->
             let
                 minIzq = encontrarMinimo izq
                 minDer = encontrarMinimo der
@@ -299,32 +303,43 @@ hijoDerecho arbol =
 
 nietoIzquierdoIzquierdo : Tree a -> Maybe (Tree a)
 nietoIzquierdoIzquierdo arbol =
-   {-  case hijoIzquierdo arbol of
-        Nothing -> Nothing
-        Just Hijo -> hijoIzquierdo Hijo   -}
+     case hijoIzquierdo arbol of
+        Nothing ->
+            Nothing
 
-    Maybe.andThen hijoIzquierdo (hijoIzquierdo arbol)    -- eso para nieto
-   -- maybe.andThen hijoIzquierdo (maybe.andThen hijoIzquierdo (hijoIzquierdo arbol)) -- en caso de que haya bisnieto
-    {- case arbol of 
-        Empty -> Nothing
-        Node _ Empty _  -> Nothing
-        Node _ (Node _ Empty _) _ -> Nothing
-        Node _ (Node _ izq _) _ -> Just izq
- -}
+        Just hijo ->
+            hijoIzquierdo hijo
+ 
 
-{-- 18. Buscar en Profundidad
+-- 18. Buscar en Profundidad
 
 
 obtenerSubarbol : a -> Tree a -> Maybe (Tree a)
-obtenerSubarbol valor arbol =
+obtenerSubarbol buscado arbol =
     case arbol of
-        Empty -> Nothing 
-        Node _ izq der -> 
+        Empty ->
+            Nothing
+
+        Node valor izq der ->
+            if valor == buscado then
+                Just arbol
+            else
+                case obtenerSubarbol buscado izq of
+                    Just subarbol ->
+                        Just subarbol
+
+                    Nothing ->
+                        obtenerSubarbol buscado der
 
 buscarEnSubarbol : a -> a -> Tree a -> Maybe a
 buscarEnSubarbol valor1 valor2 arbol =
-    Nothing
--}
+    case obtenerSubarbol valor1 arbol of
+        Nothing ->
+            Nothing
+
+        Just subarbol ->
+            buscar valor2 subarbol
+
 
 -- ============================================================================
 -- PARTE 3: RESULT PARA VALIDACIONES
@@ -630,7 +645,7 @@ filterArbol predicado arbol =
 
         Node v izq der -> 
             if predicado v then
-                Node V (filterArbol predicado izq) (filterArbol predicado der)¨
+                Node v (filterArbol predicado izq) (filterArbol predicado der)
             else
                 Empty
 
@@ -641,8 +656,16 @@ filterArbol predicado arbol =
 
 foldArbol : (a -> b -> b) -> b -> Tree a -> b
 foldArbol funcion acumulador arbol =
-    acumulador
+    case arbol of
+            Empty ->
+                acumulador
 
+            Node valor izq der ->
+                let
+                    acumDespuesIzq = foldArbol funcion acumulador izq
+                    acumDespuesRaiz = funcion valor acumDespuesIzq
+                in
+                foldArbol funcion acumDespuesRaiz der
 
 
 -- 38. Eliminar de BST
@@ -650,7 +673,69 @@ foldArbol funcion acumulador arbol =
 
 eliminarBST : comparable -> Tree comparable -> Result String (Tree comparable)
 eliminarBST valor arbol =
-    Err "El valor no existe en el árbol"
+    case arbol of
+        Empty ->
+            Err "El valor no existe en el árbol"
+
+        Node v izq der ->
+            case compare valor v of
+                EQ ->
+                    -- ¡Encontramos el nodo a eliminar!
+                    case (izq, der) of
+                        (Empty, Empty) ->
+                            -- Caso 1: hoja
+                            Ok Empty
+
+                        (Empty, _) ->
+                            -- Caso 2: solo hijo derecho
+                            Ok der
+
+                        (_, Empty) ->
+                            -- Caso 2: solo hijo izquierdo
+                            Ok izq
+
+                        (_, _) ->
+                            -- Caso 3: dos hijos → reemplazar con mínimo del subárbol derecho
+                            case encontrarMinimoYResto der of
+                                (minVal, nuevoDer) ->
+                                    Ok (Node minVal izq nuevoDer)
+
+                LT ->
+                    -- Buscar en subárbol izquierdo
+                    case eliminarBST valor izq of
+                        Err msg ->
+                            Err msg
+
+                        Ok nuevoIzq ->
+                            Ok (Node v nuevoIzq der)
+
+                GT ->
+                    -- Buscar en subárbol derecho
+                    case eliminarBST valor der of
+                        Err msg ->
+                            Err msg
+
+                        Ok nuevoDer ->
+                            Ok (Node v izq nuevoDer)
+
+
+-- Función auxiliar: encuentra el mínimo y elimina su nodo hoja
+encontrarMinimoYResto : Tree comparable -> ( comparable, Tree comparable )
+encontrarMinimoYResto arbol =
+    case arbol of
+        Node val Empty der ->
+            -- Este es el mínimo (no tiene hijo izquierdo)
+            (val, der)
+
+        Node val izq der ->
+            let
+                (minVal, nuevoIzq) = encontrarMinimoYResto izq
+            in
+            (minVal, Node val nuevoIzq der)
+
+        Empty ->
+            -- Esto nunca debería ocurrir si se llama solo desde eliminarBST
+            Debug.todo "encontrarMinimoYResto llamado con Empty"
 
 
 
@@ -659,8 +744,21 @@ eliminarBST valor arbol =
 
 desdeListaBST : List comparable -> Result String (Tree comparable)
 desdeListaBST lista =
-    Err "Valor duplicado"
+    construirDesdeLista lista Empty
 
+construirDesdeLista : List comparable -> Tree comparable -> Result String (Tree comparable)
+construirDesdeLista lista arbol =
+    case lista of
+        [] ->
+            Ok arbol
+
+        valor :: resto ->
+            case insertarBST valor arbol of
+                Err _ ->
+                    Err "Valor duplicado"
+
+                Ok nuevoArbol ->
+                    construirDesdeLista resto nuevoArbol
 
 
 -- 40. Verificar Balance
@@ -668,7 +766,19 @@ desdeListaBST lista =
 
 estaBalanceado : Tree a -> Bool
 estaBalanceado arbol =
-    False
+    case arbol of
+        Empty ->
+            True
+
+        Node _ izq der ->
+            let
+                hIzq = altura izq
+                hDer = altura der
+                balanceadoRaiz = abs (hIzq - hDer) <= 1
+            in
+            balanceadoRaiz
+                && estaBalanceado izq
+                && estaBalanceado der
 
 
 
@@ -677,7 +787,35 @@ estaBalanceado arbol =
 
 balancear : Tree comparable -> Tree comparable
 balancear arbol =
-    Empty
+    balancearDesdeLista (inorder arbol)
+
+
+balancearDesdeLista : List comparable -> Tree comparable
+balancearDesdeLista lista =
+    case lista of
+        [] ->
+            Empty
+
+        _ ->
+            let
+                len = List.length lista
+                mitad = len // 2
+                izquierda = List.take mitad lista
+                resto = List.drop mitad lista
+                valorRaiz =
+                    case resto of
+                        [] ->
+                            Debug.todo "imposible"
+
+                        x :: _ ->
+                            x
+
+                derecha = List.drop 1 resto
+            in
+            Node valorRaiz
+                (balancearDesdeLista izquierda)
+                (balancearDesdeLista derecha)
+        
 
 
 
@@ -691,8 +829,30 @@ type Direccion
 
 encontrarCamino : a -> Tree a -> Result String (List Direccion)
 encontrarCamino valor arbol =
-    Err "El valor no existe en el árbol"
+    case encontrarCaminoAux valor arbol [] of
+    Just camino ->
+        Ok (List.reverse camino)
 
+    Nothing ->
+        Err "El valor no existe en el árbol"
+
+
+encontrarCaminoAux : a -> Tree a -> List Direccion -> Maybe (List Direccion)
+encontrarCaminoAux valor arbol caminoAcumulado =
+    case arbol of
+        Empty ->
+            Nothing
+
+        Node v izq der ->
+            if v == valor then
+                Just caminoAcumulado
+            else
+                case encontrarCaminoAux valor izq (Izquierda :: caminoAcumulado) of
+                    Just camino ->
+                        Just camino
+
+                    Nothing ->
+                        encontrarCaminoAux valor der (Derecha :: caminoAcumulado)
 
 
 -- 43. Seguir Camino
@@ -700,7 +860,31 @@ encontrarCamino valor arbol =
 
 seguirCamino : List Direccion -> Tree a -> Result String a
 seguirCamino camino arbol =
-    Err "Camino inválido"
+    case camino of
+        [] ->
+            case arbol of
+                Empty ->
+                    Err "Camino inválido"
+                Node v _ _ ->
+                    Ok v
+
+        Izquierda :: resto ->
+            case arbol of
+                Empty ->
+                    Err "Camino inválido"
+                Node _ Empty _ ->
+                    Err "Camino inválido"
+                Node _ izq _ ->
+                    seguirCamino resto izq
+
+        Derecha :: resto ->
+            case arbol of
+                Empty ->
+                    Err "Camino inválido"
+                Node _ _ Empty ->
+                    Err "Camino inválido"
+                Node _ _ der ->
+                    seguirCamino resto der
 
 
 
@@ -709,14 +893,41 @@ seguirCamino camino arbol =
 
 ancestroComun : comparable -> comparable -> Tree comparable -> Result String comparable
 ancestroComun valor1 valor2 arbol =
-    Err "Uno o ambos valores no existen en el árbol"
+    if not (contiene valor1 arbol) || not (contiene valor2 arbol) then
+        Err "Uno o ambos valores no existen en el árbol"
+    else
+        case buscarLCA valor1 valor2 arbol of
+            Just v ->
+                Ok v
+
+            Nothing ->
+                Err "Uno o ambos valores no existen en el árbol"
+
+
+buscarLCA : comparable -> comparable -> Tree comparable -> Maybe comparable
+buscarLCA v1 v2 arbol =
+    let
+        (minV, maxV) =
+            if v1 <= v2 then (v1, v2) else (v2, v1)
+    in
+    case arbol of
+        Empty ->
+            Nothing
+
+        Node v izq der ->
+            if minV <= v && v <= maxV then
+                Just v
+            else if v < minV then
+                buscarLCA v1 v2 der
+            else
+                buscarLCA v1 v2 izq
 
 
 
 -- ============================================================================
 -- PARTE 6: DESAFÍO FINAL - SISTEMA COMPLETO
 -- ============================================================================
-{-}
+
 
 -- 45. Sistema Completo de BST
 -- (Las funciones individuales ya están definidas arriba)
@@ -778,7 +989,22 @@ validarResult arbol =
 
 obtenerEnPosicion : Int -> Tree comparable -> Result String comparable
 obtenerEnPosicion posicion arbol =
-    Err "Posición inválida"
+    if posicion < 0 then
+        Err "Posición inválida"
+    else
+        let
+            lista = inorder arbol
+            len = List.length lista
+        in
+        if posicion >= len then
+            Err "Posición inválida"
+        else
+            case List.drop posicion lista of
+                [] ->
+                    Err "Posición inválida"
+
+                x :: _ ->
+                    Ok x
 
 
 
@@ -811,5 +1037,17 @@ aLista arbol =
 
 desdeListaBalanceada : List comparable -> Tree comparable
 desdeListaBalanceada lista =
-    Empty
--}
+    lista
+        |> List.sort
+        |> eliminarDuplicados
+        |> balancearDesdeLista
+
+
+eliminarDuplicados : List comparable -> List comparable
+eliminarDuplicados lista =
+    case lista of
+        [] ->
+            []
+
+        x :: resto ->
+            x :: eliminarDuplicados (List.filter (\y -> y /= x) resto)

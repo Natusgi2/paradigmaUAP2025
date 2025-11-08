@@ -409,7 +409,7 @@ testsExiste =
 -- TESTS PARA UNIR SIN DUPLICADOS
 
 
-{- testsUnirOfSet : Test
+testsUnirOfSet : Test
 testsUnirOfSet =
     describe "Tests para unirOfSet"
         [ test "unir sin duplicados - caso normal" <|
@@ -429,13 +429,13 @@ testsUnirOfSet =
                 unirOfSet [ 1, 2 ] [ 3, 4 ]
                     |> Expect.equal [ 1, 2, 3, 4 ]
         ]
- -}
+
 
 
 -- TESTS PARA REMOVER DUPLICADOS
 
 
-{- testsRemoverDuplicados : Test
+testsRemoverDuplicados : Test
 testsRemoverDuplicados =
     describe "Tests para removerDuplicados"
         [ test "remover duplicados normales" <|
@@ -456,7 +456,7 @@ testsRemoverDuplicados =
                     |> Expect.equal []
         ]
 
- -}
+ 
 
 -- TESTS PARA SUBSETS (OPCIONAL)
 
